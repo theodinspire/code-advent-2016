@@ -1,4 +1,4 @@
-package com.theodinspire.code-advent-2016;
+package com.theodinspire.codeadvent;
 
 /**
  * Hello world!
