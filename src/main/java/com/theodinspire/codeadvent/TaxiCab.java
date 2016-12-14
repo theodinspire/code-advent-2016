@@ -1,11 +1,10 @@
 package com.theodinspire.codeadvent;
 
-import javafx.collections.transformation.SortedList;
-
 import java.util.*;
 
 /**
  * Created by ecormack on 12/13/2016.
+ *
  */
 public class TaxiCab {
     private Heading heading;
@@ -14,16 +13,13 @@ public class TaxiCab {
 
     private StreetCorner firstCrossing;
 
-    private List<Leg> log = new LinkedList<>();
+    private Queue<StreetCorner> log = new LinkedList<>();
 
     public TaxiCab() { this(Heading.NORTH); }
     public TaxiCab(Heading heading) {
         this.heading = heading;
     }
 
-    public Heading getHeading() { return heading; }
-    public int getX() { return x; }
-    public int getY() { return y; }
     public boolean hasMadeLoop() { return firstCrossing != null; }
     public StreetCorner getFirstCrossing() { return firstCrossing; }
 
@@ -58,20 +54,37 @@ public class TaxiCab {
         move(Integer.parseInt(command.substring(1)));
 
         int[] end = {x, y};
-        Leg leg = new Leg(start, end);
+
+        log.add(new StreetCorner(start));
 
         if (firstCrossing == null) {
-            LegComparator legComparator = new LegComparator(heading);
-            log.sort(legComparator);
-            Iterator<Leg> iter = log.iterator();
+            Iterator<StreetCorner> iter = log.iterator();
 
-            while (iter.hasNext() && firstCrossing == null) {
-                firstCrossing = leg.getCrossing(iter.next());
+            StreetCorner a;
+            StreetCorner b = iter.next();   //  iter will always have an initial next at this point
+            List<StreetCorner> crossings = new LinkedList<>();
+
+            Leg current = new Leg(start, end);
+
+            while (iter.hasNext()) {
+                a = b;
+                b = iter.next();
+
+                if (iter.hasNext()) {
+                    Leg previous = new Leg(a, b);
+
+                    StreetCorner crossing = current.getCrossing(previous);
+                    if (crossing != null) crossings.add(crossing);
+                }
             }
-        }
 
-        log.add(leg);
+            crossings.sort(new CornerComparator(heading));
+
+            if (!crossings.isEmpty()) firstCrossing = crossings.get(0);
+        }
     }
+
+    public StreetCorner getCurrentCorner() { return new StreetCorner(x, y); }
 
     public static void main(String[] args) {
         TaxiCab taxi = new TaxiCab();
@@ -87,40 +100,21 @@ public class TaxiCab {
 
         List<String> directions = new LinkedList<>(Arrays.asList(dir.split(", ")));
 
-//        try {
-//            BufferedReader input = new BufferedReader(
-//                    new InputStreamReader(new URL("http://adventofcode.com/2016/day/1/input").openStream()));
-//
-//            String line = null;
-//            while ((line = input.readLine()) != null)
-//                System.out.println(line);
-//
-//            //directions.addAll(Arrays.asList(input.readLine().split(", ")));
-//        } catch (Exception e) {
-//            System.out.println("Something went wrong");
-//            e.printStackTrace();
-//            System.exit(1);
-//        }
-
         Iterator<String> iter = directions.iterator();
         int count = 0;
 
         while (iter.hasNext() && !taxi.hasMadeLoop()) {
             String direction = iter.next();
             taxi.makeLeg(direction.trim());
-
-            System.out.print(String.format("[ %4d, %4d]", taxi.getX(), taxi.getY()));
-            //if (count % 7 == 6) System.out.println();
             ++count;
         }
 
         System.out.println();
+        System.out.println("Location after end of first page is: " + taxi.getCurrentCorner());
         System.out.println("Easter Bunny Headquarters is at: " + taxi.getFirstCrossing());
-//        System.out.println("Easter Bunny Headquarters is " + taxi.getDistanceTraveled() +
-//            " blocks away");
+        System.out.println("Distance after end of first page is " + taxi.getDistanceTraveled() + " blocks away");
         System.out.println("Easter Bunny Headquarters is " + taxi.getFirstCrossing().getDistance() + " blocks away");
         System.out.println("Journey took this many legs: " + count);
-        System.out.println("Taxi has made loop: " + taxi.hasMadeLoop());
     }
 
     private enum Heading {
@@ -161,7 +155,6 @@ public class TaxiCab {
         public int getY() { return y; }
 
         public int getDistance(int a, int b)        { return Math.abs(x - a) + Math.abs(y - b); }
-        public int getDistance(StreetCorner that)   { return getDistance(that.getX(), that.getY()); }
         public int getDistance()                    { return getDistance(0, 0); }
 
         @Override
@@ -188,57 +181,81 @@ public class TaxiCab {
     }
 
     private class Leg {
+        private int x1;
+        private int x2;
+        private int y1;
+        private int y2;
+
         private int minX;
         private int maxX;
         private int minY;
         private int maxY;
 
-        private boolean northSouth;
+        private Heading heading;
 
         public Leg(int x1, int x2, int y1, int y2) {
+            this.x1 = x1;   this.x2 = x2;   this.y1 = y1;   this.y2 = y2;
+
             minX = Math.min(x1, x2);
             maxX = Math.max(x1, x2);
             minY = Math.min(y1, y2);
             maxY = Math.max(y1, y2);
 
-            northSouth = x1 == x2;
+            if (x1 == x2)
+                heading = (y1 > y2 ? Heading.NORTH : Heading.SOUTH);
+            else // if (y1 == y2)
+                heading = (x1 > x2 ? Heading.EAST : Heading.WEST);
         }
         public Leg(int[] a, int[] b) { this(a[0], b[0], a[1], b[1]); }
         public Leg(StreetCorner a, StreetCorner b) { this(a.getX(), b.getX(), a.getY(), b.getY()); }
 
-        public boolean crosses(Leg that) {
-            //  Assuming N-S or E-W directions
-            if (this.northSouth) {
-                return this.minX > that.minX && this.maxX < that.maxX &&
-                        this.minY < that.minY && this.maxY > that.minY;
-            } else if (that.northSouth){
-                return this.minX < that.minX && this.maxX > that.maxX &&
-                        this.minY > that.minY && this.maxY < that.minY;
-            } else {
-                return false;
-            }
+        @Override
+        public String toString() {
+            return String.format("{ X: (%3d -> %3d), Y: (%3d -> %3d) }", x1, x2, y1, y2);
         }
 
         public StreetCorner getCrossing(Leg that) {
-            if (this.crosses(that)) {
-                if  (this.northSouth)   return new StreetCorner(this.minX, that.minY);
-                else                    return new StreetCorner(that.minX, this.minY);
-            } else return null;
+            if (this.intersects(that)) {
+                int greaterMinX = Math.max(this.minX, that.minX);
+                int lesserMaxX  = Math.min(this.maxX, that.maxX);
+                int greaterMinY = Math.max(this.minY, that.minY);
+                int lesserMaxY  = Math.min(this.maxY, that.maxY);
+
+                switch (heading) {
+                    case NORTH: return new StreetCorner(this.x1, Math.min(greaterMinY, lesserMaxY));
+                    case EAST:  return new StreetCorner(this.y1, Math.min(greaterMinX, lesserMaxX));
+                    case SOUTH: return new StreetCorner(this.x1, Math.max(greaterMinY, lesserMaxY));
+                    case WEST:  return new StreetCorner(this.y1, Math.max(greaterMinX, lesserMaxX));
+                }
+            }
+            return null;
+        }
+
+        public boolean intersects(Leg that) {
+            return yOverlap(that) && xOverlap(that);
+        }
+
+        private boolean yOverlap(Leg that) {
+            return Math.max(this.minY, that.minY) <= Math.min(this.maxY, that.maxY);
+        }
+
+        private boolean xOverlap(Leg that) {
+            return Math.max(this.minX, that.minX) <= Math.min(this.maxX, that.maxX);
         }
     }
 
-    private class LegComparator implements Comparator<Leg> {
+    private class CornerComparator implements Comparator<StreetCorner> {
         Heading heading;
 
-        public LegComparator(Heading heading) { this.heading = heading; }
+        public CornerComparator(Heading heading) { this.heading = heading; }
 
         @Override
-        public int compare(Leg o1, Leg o2) {
+        public int compare(StreetCorner o1, StreetCorner o2) {
             switch (heading) {
-                case NORTH: return o1.minY - o2.minY;
-                case EAST:  return o1.minX - o2.minX;
-                case SOUTH: return o2.maxY - o1.maxY;
-                case WEST:  return o2.maxX - o1.maxX;
+                case NORTH: return o1.getY() - o2.getY();
+                case EAST:  return o1.getX() - o2.getX();
+                case SOUTH: return o2.getY() - o1.getY();
+                case WEST:  return o2.getX() - o1.getX();
                 default:    return 0;
             }
         }
