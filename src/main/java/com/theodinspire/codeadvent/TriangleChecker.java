@@ -22,7 +22,7 @@ public class TriangleChecker {
     }
 
     private static boolean checkTrio(int[] trio) {
-        return trio[0] + trio[1] >= trio[2];
+        return trio[0] + trio[1] > trio[2];
     }
 
     private static boolean parseAndCheck(String input) {
@@ -50,6 +50,6 @@ public class TriangleChecker {
 
     public static void main(String[] args) {
         System.out.println(String.format("Input has %d valid triangles",
-                batchParse("src/resources/TriangleChecker/tst.txt")));
+                batchParse("src/resources/TriangleChecker/input.txt")));
     }
 }
