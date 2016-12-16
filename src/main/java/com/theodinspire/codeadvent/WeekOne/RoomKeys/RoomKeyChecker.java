@@ -1,4 +1,4 @@
-package com.theodinspire.codeadvent.RoomKeys;
+package com.theodinspire.codeadvent.WeekOne.RoomKeys;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,7 +13,7 @@ public class RoomKeyChecker {
         Stack<RoomKey> keys = new Stack<>();
 
         try (BufferedReader reader =
-                     new BufferedReader(new FileReader("src/resources/RoomKeyChecker/input.txt"))) {
+                     new BufferedReader(new FileReader("src/resources/WeekOne/RoomKeyChecker/input.txt"))) {
             String line;
 
             KeyChecker checker = new PartAChecker();

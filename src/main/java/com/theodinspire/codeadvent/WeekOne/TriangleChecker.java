@@ -1,4 +1,4 @@
-package com.theodinspire.codeadvent;
+package com.theodinspire.codeadvent.WeekOne;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -50,6 +50,6 @@ public class TriangleChecker {
 
     public static void main(String[] args) {
         System.out.println(String.format("Input has %d valid triangles",
-                batchParse("src/resources/TriangleChecker/input.txt")));
+                batchParse("src/resources/WeekOne/TriangleChecker/input.txt")));
     }
 }

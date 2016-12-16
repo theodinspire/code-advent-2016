@@ -1,4 +1,4 @@
-package com.theodinspire.codeadvent;
+package com.theodinspire.codeadvent.WeekOne;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -81,10 +81,10 @@ public class BathroomKeyPad {
     public static void main(String[] args) {
         BathroomKeyPad pad = new BathroomKeyPad();
         System.out.println("9-digit, square pad:");
-        System.out.println("Test key code is: " + pad.getCode("src/resources/BathroomKeyPad/test.txt"));
+        System.out.println("Test key code is: " + pad.getCode("src/resources/WeekOne/BathroomKeyPad/test.txt"));
         pad.setFinger(1, 1);
         System.out.println("Actual key code is: " +
-                pad.getCode("src/resources/BathroomKeyPad/instructions.txt"));
+                pad.getCode("src/resources/WeekOne/BathroomKeyPad/instructions.txt"));
 
         System.out.println();
 
@@ -102,9 +102,9 @@ public class BathroomKeyPad {
         });
 
         System.out.println("13-digit, diamond pad:");
-        System.out.println("Test key code is: " + odd.getCode("src/resources/BathroomKeyPad/test.txt"));
+        System.out.println("Test key code is: " + odd.getCode("src/resources/WeekOne/BathroomKeyPad/test.txt"));
         odd.setFinger(0, 2);
         System.out.println("Actual key code is: " +
-                odd.getCode("src/resources/BathroomKeyPad/instructions.txt"));
+                odd.getCode("src/resources/WeekOne/BathroomKeyPad/instructions.txt"));
     }
 }
