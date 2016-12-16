@@ -1,4 +1,4 @@
-package com.theodinspire.codeadvent;
+package com.theodinspire.codeadvent.WeekOne;
 
 import com.theodinspire.codeadvent.Utilities.*;
 
