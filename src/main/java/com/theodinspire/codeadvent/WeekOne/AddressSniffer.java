@@ -38,6 +38,21 @@ public class AddressSniffer {
         return false;
     }
 
+    public boolean supportsSSL() {
+        for (char x = 'a'; x <= 'z'; ++x)
+            for (char y = 'a'; y <= 'z'; ++y)
+                if (x != y) {
+                    String aba = "" + x + y + x;
+                    String bab = "" + y + x + y;
+                    for (String umbra : unbracketed)
+                        if (umbra.contains(aba))
+                            for (String braza : bracketed)
+                                if (braza.contains(bab))
+                                    return true;
+                }
+        return false;
+    }
+
     private static boolean checkStringForABBA(String string) {
         for (char x = 'a'; x <= 'z'; ++x)
             for (char y = 'a'; y <= 'z'; ++y) {
@@ -72,21 +87,25 @@ public class AddressSniffer {
     }
 
     public static void main (String[] args) {
-        int count = 0;
+        int tlsCount = 0;
+        int sslCount = 0;
         try (BufferedReader reader =
                      new BufferedReader(new FileReader("src/resources/WeekOne/AddressSniffer/input.txt"))) {
             String line;
 
-            System.out.println("Beginning hunt");
-            while ((line = reader.readLine()) != null)
-                if (new AddressSniffer(line).supportsTLS())
-                    ++count;
-            System.out.println("End of hunt");
+            while ((line = reader.readLine()) != null) {
+                AddressSniffer sniffer = new AddressSniffer(line);
+                if (sniffer.supportsTLS())
+                    ++tlsCount;
+                if (sniffer.supportsSSL())
+                    ++sslCount;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         System.out.println();
-        System.out.println(String.format("%d IPs support TLS", count));
+        System.out.println(String.format("%d IPs support TLS", tlsCount));
+        System.out.println(String.format("%d IPs support SSL", sslCount));
     }
 }
