@@ -11,7 +11,7 @@ import java.util.List;
  * Created by Eric on 18 Dec 2016.
  */
 public class Uncompressor {
-    public static String uncompress(String string)  {
+    public static String uncompress(String string) {
         StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < string.length(); ++i) {
@@ -43,6 +43,15 @@ public class Uncompressor {
         return builder.toString();
     }
 
+    public static String fullyUncompress(String input) {
+        String output = input;
+
+        while (output.matches("[\\S]*\\(\\d+x\\d+\\)[\\S]*"))
+            output = uncompress(output);
+
+        return output;
+    }
+
     public static void main(String args[]) {
         int count = 0;
 
@@ -51,11 +60,9 @@ public class Uncompressor {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                String output = uncompress(line);
+                String output = fullyUncompress(line);
 
-                while (output.matches("+\\(\\d+x\\d+\\)+"))
-
-                //System.out.println(String.format("%4d: %s", output.length(), output));
+                System.out.println(String.format("%6d: %s", output.length(), (output.length() < 81 ? output : "")));
                 count += output.length();
             }
         } catch (Exception e) {
