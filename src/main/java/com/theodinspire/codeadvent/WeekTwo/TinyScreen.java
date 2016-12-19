@@ -126,10 +126,10 @@ public class TinyScreen {
     }
 
     public static void main(String[] args) {
-        TinyScreen test = new TinyScreen("src/resources/WeekTwo/test.txt");
+        TinyScreen test = new TinyScreen("src/resources/WeekTwo/TinyScreen/test.txt");
         System.out.println("Test: \n" + test);
 
-        TinyScreen it = new TinyScreen("src/resources/WeekTwo/input.txt");
+        TinyScreen it = new TinyScreen("src/resources/WeekTwo/TinyScreen/input.txt");
         System.out.print("Final: \n" + it);
         System.out.print("Bits turned on: " + it.countOnBits());
     }
